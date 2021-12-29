@@ -1,0 +1,22 @@
+<div class="quorum-status" *ngIf="!isMeetingStarted">
+     <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header style="background-color: rgb(167 135 224);">
+               <mat-panel-title>
+                    <span > Quorum Status</span>
+               </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="quorum-block">
+               <ng-container>
+                    <label>Share Value Logged In: {{ quorumDetails.loggedInShares }} %</label>
+                    <label>Share Value Remaning: {{ quorumDetails.remaningShares }} %</label>
+                    <label *ngIf="!isQuorumAchieved">Not Achieved</label>
+                    <label *ngIf="isQuorumAchieved">Achieved</label>
+                    <ng-container *ngIf="role == 'moderator' || role == 'chairman'">
+                         <button class="btn btn-success" *ngIf="isUserVotingManager" (click)="startMeeting();">Start
+                              Meeting</button>
+                    </ng-container>
+               </ng-container>
+          </div>
+
+     </mat-expansion-panel>
+</div>

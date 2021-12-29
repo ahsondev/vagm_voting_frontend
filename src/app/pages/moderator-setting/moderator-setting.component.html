@@ -1,0 +1,22 @@
+<div class="mod-set" *ngIf="!isVotingManagerFound">
+     <mat-expansion-panel [expanded]="true">
+          <mat-expansion-panel-header style="background-color: rgb(66, 165, 245);">
+               <mat-panel-title>
+                    <span>Moderator Settings <ng-container *ngIf="isVotingManager"> - Voting Manger</ng-container></span>
+               </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ng-container>
+               <div class="moderator-settings">
+                    <ng-container>
+                         <label>{{ moderatorSettings.title }}</label>
+                         <label>{{ moderatorSettings.question }}</label>
+                         <div class="button-block" *ngIf="displayBtnBlock">
+                              <button class="btn btn-danger" (click)="moderatorAnswer(moderatorSettings.notAgreeBtnTxt);"><i class="fas fa-times"></i>{{ moderatorSettings.notAgreeBtnTxt }}</button>
+                              <button class="btn btn-primary" style="margin-left: 40px;" (click)="moderatorAnswer(moderatorSettings.agreeBtnTxt);"><i class="fas fa-check"></i> {{ moderatorSettings.agreeBtnTxt }}</button>
+                         </div>
+                    </ng-container>
+               </div>
+          </ng-container>
+     </mat-expansion-panel>
+</div>
+

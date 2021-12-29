@@ -1,0 +1,39 @@
+<ng-container *ngIf="isUserAuthenticated && isEarliestLoginTimeReached">
+     <app-header></app-header>
+     <div class="content-wrapper">
+          <div class="container-fluid">
+               
+               <div class="row">
+                    <div class="col-12 col-sm-12 col-md-8 col-lg-8 mob-view-inner pl-0">
+                         <app-audio-video></app-audio-video>
+                         <div class="has-tab-list-menu mob-view">
+                              <router-outlet></router-outlet>
+                         </div>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4 desk-view p-0">
+                         <div class="has-tab-list-menu">
+                              <router-outlet></router-outlet>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     </div>
+</ng-container>
+
+<ng-container *ngIf="!isUserAuthenticated">
+     <section class="time-count-down vote-continue d-none1">
+          <ng-container *ngIf="isUserAuthenticated && !isEarliestLoginTimeReached">
+               <div class="container">
+                    <div class="count-down">
+                         <h1>Voting will start in few hours <i class="far fa-smile"></i></h1>
+                         <img src="../../../assets/images/prpyoda-logo.png" class="img-fluid" alt="">
+                    </div>
+               </div>
+          </ng-container>
+     </section>
+</ng-container>
+
+
+<ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="white" type="ball-scale-multiple">
+     <p style="font-size: 20px; color: white">Validating...</p>
+</ngx-spinner>

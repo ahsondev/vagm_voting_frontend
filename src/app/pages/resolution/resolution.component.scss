@@ -1,0 +1,38 @@
+.resolution-block label {
+     display: block;
+}
+
+.resolution-block .mat-expansion-panel {
+     margin-top: 2px;
+}
+
+.resolution-block .btn-blk button {
+     margin-right: 10px;
+}
+
+.resolution-block .voting-details {
+     padding: 10px;
+}
+
+.timer-panel label {
+     text-align: center;
+}
+
+.resolution-block .action-block {
+     margin: 0 auto;
+     display: table;
+     max-width: 100%;
+}
+.resolution-block .action-block button {
+     width: 100%;
+     font-size: 13px;
+     margin-right: 2%;
+     margin-bottom: 2%;
+}
+
+.resolution-block .no-objection button { 
+     width: 48%;
+     font-size: 13px;
+     margin-right: 2%;
+     margin-bottom: 2%;
+}

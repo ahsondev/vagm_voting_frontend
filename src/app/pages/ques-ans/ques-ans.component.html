@@ -1,0 +1,11 @@
+<div class="ques-ans">
+     <mat-expansion-panel>
+          <mat-expansion-panel-header style="background-color: #b6d29f;">
+               <mat-panel-title>
+                    <span style="color: white !important;"> Q & A</span>
+               </mat-panel-title>
+               <button class="btn btn-danger on-tab-btn" (click)="toggleMettingChat()" *ngIf="isUserModerator">Toggle Chat</button>
+          </mat-expansion-panel-header>
+          <iframe src="https://meet.ps/mcst" allow="microphone;camera" style="height: 410px; width: 100%; border: none;"></iframe>
+     </mat-expansion-panel>
+</div>

@@ -1,0 +1,14 @@
+<div class="wrapper">
+     <mat-accordion>
+          
+          <app-moderator-setting></app-moderator-setting>
+          <ng-container *ngIf="isUserVotingManager">
+               <app-quorum-status></app-quorum-status>
+          </ng-container>
+          <ng-container  *ngIf="isUserVotingManager && isMeetingStarted">
+               <app-resolution></app-resolution>
+          </ng-container>
+          <app-ques-ans></app-ques-ans>
+          <app-end-meeting></app-end-meeting>
+     </mat-accordion>
+</div>

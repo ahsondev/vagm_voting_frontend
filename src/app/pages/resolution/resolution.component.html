@@ -1,0 +1,414 @@
+<div class="resolution-block">
+     <mat-expansion-panel [expanded]="isActiveBlockExpanded">
+          <mat-expansion-panel-header style="background-color: #cd9594;">
+               <mat-panel-title>
+                    <span style="color: white !important;">Active Resolution</span>
+               </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="active-resolution-block">
+               <ng-container *ngIf="resolutions.active.length > 0">
+                    <ng-container *ngFor="let item of resolutions.active; let i = index;">
+                         <ng-container *ngIf="!isVotingStarted">
+                              <mat-expansion-panel [expanded]="!isVotingStarted">
+                                   <mat-expansion-panel-header
+                                        style="background-color: rgb(38, 122, 66);">
+                                        <mat-panel-title>
+                                             <span style="color:white !important;">{{ item.resolution_no }} :
+                                                  {{ item.resolution_type }}</span>
+                                             
+                                        </mat-panel-title>
+                                        <button class="btn btn-danger on-tab-btn" (click)="backToPending(item)">Back</button>
+                                   </mat-expansion-panel-header>
+                                   <div class="main-details-section" id="active-resolution-{{ item.resolution_id }}">
+                                        <label>{{ item.resolution_heading }}</label>
+                                        <label>
+                                             <span>Logged In {{ activeClientsDetails.totalLoggedInUnits }} Units  </span>
+                                             <span>{{ activeClientsDetails.totalLoggedInUnitsShare }} Shares</span>
+                                        </label>
+                                   </div>
+                                   <div class="inner-details-sections">
+                                        <ng-container *ngIf="(role == 'moderator' && isCurrentUserIsVotingManager) || role == 'chairman'">
+                                             <ng-container *ngIf="item.resolution_type == 'Ordinary Resolution' && isCouncilMemberTypeResolution">
+                                                  <ng-container *ngIf="item.resolution_type_id == 3">
+                                                       <ng-container *ngIf="preNominatedMembers.length > 0">
+                                                            <label>Pre Nomination Recived</label>
+                                                            <ng-container *ngFor="let member of preNominatedMembers">
+                                                                 <label>{{ member.nominated_user_name }}</label>
+                                                            </ng-container>
+                                                       </ng-container>
+                                                       <ng-container *ngIf="preNominatedMembers.length == 0">
+                                                            <label>No Pre Nomination Recived</label>
+                                                       </ng-container>
+                                                  </ng-container>
+                                                  <ng-container *ngIf="item.resolution_type_id == 4">
+                                                       <div class="inner-details-block">
+                                                            <label>Minimum Council Member : {{ item.minCouncilMember }}</label>
+                                                            <label>Maximum Council Member : {{ item.maxCouncilMember }}</label>
+                                                       </div>
+                                                  </ng-container>
+                                                  <ng-container *ngIf="item.resolution_type_id == 5">
+                                                       <div class="inner-details-block">
+                                                            <label>Nominations Received : {{ totalNominationRecieved }}</label>
+                                                            <label>Number Of Council Member Approved : {{ noOfCouncilMemberApproved }}</label>
+                                                       </div>
+                                                  </ng-container>
+                                             </ng-container>
+                                        </ng-container>
+                                   </div>
+                                   <div class="action-section">
+                                        <ng-container *ngIf="(role == 'moderator' && isCurrentUserIsVotingManager) || role == 'chairman'">
+                                             <ng-container *ngIf="item.resolution_type != 'Ordinary Resolution'">
+                                                  <div class="action-block">
+                                                       <button class="btn btn-success" (click)="startVoting(item);">Start Voting</button>
+                                                  </div>
+                                             </ng-container>
+                                             <ng-container *ngIf="item.resolution_type == 'Ordinary Resolution'">
+                                                  <ng-container *ngIf="!isCouncilMemberTypeResolution">
+                                                       <div class="action-block">
+                                                            <button class="btn btn-success" (click)="startVoting(item);">Ask For Objection</button>
+                                                       </div>
+                                                  </ng-container>
+                                                  <ng-container *ngIf="isCouncilMemberTypeResolution">
+                                                       <ng-container *ngIf="item.resolution_type_id == 3">
+                                                            <div class="action-block">
+                                                                 <button class="btn btn-primary" (click)="startVoting(item)">Request Nominations</button>
+                                                            </div>
+                                                       </ng-container>
+                                                       <ng-container *ngIf="item.resolution_type_id == 4">
+                                                            <div class="action-block">
+                                                                 <button class="btn btn-primary" (click)="startVoting(item)">Start Voting</button>
+                                                            </div>
+                                                       </ng-container>
+                                                       <ng-container *ngIf="item.resolution_type_id == 5">
+                                                            <div class="action-block">
+                                                                 <ng-container *ngIf="isEligibleToDeclare">
+                                                                      <button class="btn btn-primary" (click)="startVoting(item)">Declare Decision</button>
+                                                                 </ng-container>
+                                                                 <ng-container *ngIf="!isEligibleToDeclare">
+                                                                      <button class="btn btn-primary" (click)="startVoting(item)">Start Voting</button>
+                                                                 </ng-container>
+                                                            </div>
+                                                       </ng-container>
+                                                  </ng-container>
+                                             </ng-container>
+                                        </ng-container>
+                                   </div>
+                              </mat-expansion-panel>
+                         </ng-container>
+                         <!-- Voting Panel Start Here -->
+                         <ng-container *ngIf="isVotingStarted && role == 'moderator'">
+                              <div class="voting-panel">
+                                   <mat-expansion-panel [expanded]="isVotingStarted">
+                                        <mat-expansion-panel-header
+                                             style="background-color: rgb(38, 122, 66);">
+                                             <mat-panel-title>
+                                                  <span style="color:white !important;">{{ item.resolution_no }} :
+                                                       Voting Panel</span>
+                                             </mat-panel-title>
+                                        </mat-expansion-panel-header>
+                                        <div class="main-details-section">
+                                             <label>{{ resolution.resolution_type }}</label>
+                                             <label>{{ resolution.resolution_heading }}</label>
+                                             <label>
+                                                  <span>Logged In {{ activeClientsDetails.totalLoggedInUnits }} Units  </span>
+                                                  <span>{{ activeClientsDetails.totalLoggedInUnitsShare }} Shares</span>
+                                             </label>
+                                             <label>
+                                                  <span>Voted : {{ activeClientsDetails.totalActiveUserVoted }} Units  </span> 
+                                                  <span>Total Shares : {{ activeClientsDetails.totalActiveUserVotedShare }}</span>
+                                             </label>
+                                        </div>
+                                        <div class="inner-details-sections">
+                                             <ng-container *ngIf="(role == 'moderator' || role == 'chairman') && isCurrentUserIsVotingManager">
+                                                  <ng-container *ngIf="item.resolution_type == 'Ordinary Resolution' && isCouncilMemberTypeResolution">
+                                                       <ng-container *ngIf="item.resolution_type_id == 4">
+                                                            <div class="inner-details-block">
+                                                                 <label>Minimum Council Member : {{ item.minCouncilMember }}</label>
+                                                                 <label>Maximum Council Member : {{ item.maxCouncilMember }}</label>
+                                                            </div>
+                                                       </ng-container>
+                                                  </ng-container>
+                                             </ng-container>
+                                        </div>
+                                        <div class="timer-section">
+                                             <ng-container *ngIf="!isShowTimer && !isTimerStarted && !isTimerFinished">
+                                                  <button class="btn btn-success" (click)="showTimer();">Countdown Timer</button>
+                                             </ng-container>
+                                             <ng-container *ngIf="isShowTimer">
+                                                  <select (change)="startTimer($event)">
+                                                       <option value="null">Countdown Timer</option>
+                                                       <option value="1">1 Minute</option>
+                                                       <option value="2">2 Minute</option>
+                                                       <option value="3">3 Minute</option>
+                                                       <option value="4">4 Minute</option>
+                                                       <option value="5">5 Minute</option>
+                                                  </select>
+                                             </ng-container>
+                                             <ng-container *ngIf="isTimerStarted && !isTimerFinished">
+                                                  <label>{{ timer }}</label>
+                                             </ng-container>
+                                        </div>
+                                        <div class="result-section">
+                                             <ng-container *ngIf="isTimerFinished">
+                                                  <ngx-spinner></ngx-spinner>
+                                                  <ng-container *ngIf="isVotingResultCalculated">
+                                                       <ng-container *ngIf="resolution.resolution_type != 'Ordinary Resolution' || isGoForVote || isGoForPole">
+                                                            <div class="result-block">
+                                                                 <label>Decision : {{ resolution.decision }}</label>
+                                                                 <label>For : {{ resolution.total_votes_for }}</label>
+                                                                 <label>Against : {{ resolution.total_votes_against }}</label>
+                                                                 <label>Abstained : {{ resolution.total_votes_abstain }}</label>
+                                                                 <button class="btn btn-success" (click)="publish();" *ngIf="!isResultPublished">Publish</button>
+                                                                 <button class="btn btn-success" (click)="closeAndMove();" [disabled]="!isResultPublished">Close And Move</button>
+                                                            </div>
+                                                       </ng-container>
+                                                       <ng-container *ngIf="resolution.resolution_type == 'Ordinary Resolution'">
+                                                            <ng-container *ngIf="!isCouncilMemberTypeResolution && !isGoForVote && !isGoForPole">
+                                                                 <div class="result-block">
+                                                                      <ng-container *ngIf="usersHavingObjection.length == 0">
+                                                                           <label>No Objection Recieved</label>
+                                                                      </ng-container>
+                                                                      <ng-container *ngIf="usersHavingObjection.length > 0">
+                                                                           <label>Objection Recieved By Below Users</label>
+                                                                           <mat-expansion-panel *ngFor="let item of usersHavingObjection;">
+                                                                                <mat-expansion-panel-header style="background-color: green;">
+                                                                                     <mat-panel-title>
+                                                                                          <span style="color: black !important;">{{ item.user.nickname }}</span>
+                                                                                     </mat-panel-title>
+                                                                                </mat-expansion-panel-header>
+                                                                                <div class="action-block">
+                                                                                     <button class="btn btn-primary" (click)="adressed(item)">Addressed</button>
+                                                                                </div>
+                                                                           </mat-expansion-panel>
+                                                                      </ng-container>
+                                                                      <div class="action-block no-objection">
+                                                                           <button class="btn btn-secondary" (click)="closeAndMove()" [disabled]="usersHavingObjection.length > 0">Declared Approved</button>
+                                                                           <button class="btn btn-secondary" (click)="goForVote()" >Go For Vote</button>
+                                                                           <button class="btn btn-secondary" (click)="goForPole()" >Go For Pole</button>
+                                                                           <button class="btn btn-secondary" (click)="closeAndCreate()" [disabled]="usersHavingObjection.length > 0">Close & Create New</button>
+                                                                      </div>
+                                                                 </div>
+                                                            </ng-container>
+                                                            <ng-container *ngIf="isCouncilMemberTypeResolution">
+                                                                 <ng-container *ngIf="resolution.resolution_type_id == 3">
+                                                                      <div class="result-block">
+                                                                           <label>Pre Nominated : {{ preNominatedMembers.length }}</label>
+                                                                           <ng-container *ngFor="let member of preNominatedMembers">
+                                                                                <label>{{ member.nominated_user_name }}</label>
+                                                                           </ng-container>
+                                                                           <label>New Nominated : {{ newNominatedMembers.length }}</label>
+                                                                           <ng-container *ngFor="let member of newNominatedMembers">
+                                                                                <label>{{ member.nickname }}</label>
+                                                                           </ng-container>
+                                                                           <div class="action-block">
+                                                                                <button class="btn btn-success" (click)="publish();" *ngIf="!isResultPublished">Publish</button>
+                                                                                <button class="btn btn-secondary" (click)="closeAndMove()" [disabled]="!isResultPublished">Close & Move</button>
+                                                                           </div>
+                                                                      </div>
+                                                                 </ng-container>
+                                                                 <ng-container *ngIf="resolution.resolution_type_id == 4">
+                                                                      <div class="result-block">
+                                                                           <ng-container *ngFor="let response of responseOnNumberOfCouncilMember">
+                                                                                <label>
+                                                                                     <span>{{ response.range }} Members : </span>
+                                                                                     <span>{{ response.percentage }}%</span>
+                                                                                </label>
+                                                                                <label *ngIf="response.max">Decision : {{ response.range }} Members</label>
+                                                                           </ng-container>
+                                                                           <div class="action-block">
+                                                                                <button class="btn btn-success" (click)="publish();" *ngIf="!isResultPublished">Publish</button>
+                                                                                <button class="btn btn-secondary" (click)="closeAndMove()" [disabled]="!isResultPublished">Close & Move</button>
+                                                                           </div>
+                                                                      </div>
+                                                                 </ng-container>
+                                                                 <ng-container *ngIf="resolution.resolution_type_id == 5">
+                                                                      <div class="result-block">
+                                                                           <label>Elected Members</label>
+                                                                           <ng-container *ngFor="let response of noOfVoteOnCouncilMember">
+                                                                                <label>
+                                                                                     <span style="background-color: green; color: white;">{{ response.nickname }}</span>
+                                                                                     <span>{{ response.count }} Votes</span>
+                                                                                </label>
+                                                                           </ng-container>
+                                                                           <div class="action-block">
+                                                                                <button class="btn btn-success" (click)="publish();" *ngIf="!isResultPublished">Publish</button>
+                                                                                <button class="btn btn-secondary" (click)="closeAndMove()" [disabled]="!isResultPublished">Close & Move</button>
+                                                                           </div>
+                                                                      </div>
+                                                                 </ng-container>
+                                                            </ng-container>
+                                                       </ng-container>
+                                                  </ng-container>
+                                                  <ng-container *ngIf="!isVotingResultCalculated">
+                                                       <label>Please wait fetching Decision</label>
+                                                  </ng-container>
+                                             </ng-container>
+                                        </div>
+                                   </mat-expansion-panel>
+                              </div>
+                         </ng-container>
+                         <!-- Voting Panel End Here -->
+                         <mat-expansion-panel *ngIf="isVotingStarted">
+                              <mat-expansion-panel-header
+                                   style="background-color: rgb(38, 122, 66);">
+                                   <mat-panel-title>
+                                        <span style="color:white !important;">{{ item.resolution_no }} :
+                                             {{ item.resolution_type }}</span>
+                                   </mat-panel-title>
+                              </mat-expansion-panel-header>
+                              <div class="resolution-details">
+                                   <p>{{ item.resolution_text }}</p>
+                              </div>
+                         </mat-expansion-panel>
+
+                    </ng-container>
+               </ng-container>
+               <ng-container *ngIf="resolutions.active.length == 0">
+                    <p>No Active Resolution Found.</p>
+               </ng-container>
+          </div>
+     </mat-expansion-panel>
+     <mat-expansion-panel *ngIf="role == 'moderator'" [expanded]="isPendingBlockExpanded">
+          <mat-expansion-panel-header style="background-color: #b4d5de;">
+               <mat-panel-title>
+                    <span >Pending Resolution</span>
+               </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="pending-resolution-block">
+               <ng-container *ngIf="resolutions.pending.length > 0">
+                    <mat-expansion-panel *ngFor="let item of resolutions.pending; let i = index;">
+                         <mat-expansion-panel-header
+                              style="background-color: rgb(90, 120, 141);">
+                              <mat-panel-title>
+                                   <span style="color:white !important;">{{ item.resolution_no }} : {{ item.resolution_type }}</span>
+                              </mat-panel-title>
+                         </mat-expansion-panel-header>
+                         <div class="pending-resolution" id="pending-resolution-{{ item.resolution_id }}">
+                              <label>{{ item.resolution_type }}</label>
+                              <label>{{ item.resolution_heading }}</label>
+                              <div class="message-section" id="pending-message-{{ item.resolution_id }}"
+                                   style="display: none; color: red;">
+                                   <p>{{ message }}</p>
+                              </div>
+                              <button class="btn btn-primary"
+                                   (click)="startResolution(item.resolution_id);">Start</button>
+                         </div>
+
+                         <div class="confirmation-block" style="display: none;"
+                              id="confirmation-block-{{ item.resolution_id }}">
+                              <label>{{ item.resolution_type }}</label>
+                              <label>{{ item.resolution_heading }}</label>
+                              <div class="btn-blk">
+                                   <button class="btn btn-danger"
+                                        (click)="cancelStartResolution(item.resolution_id);">Cancel</button>
+                                   <button class="btn btn-success"
+                                        (click)="confirmStartResolution(item.resolution_id);">Confirm</button>
+                              </div>
+                         </div>
+                    </mat-expansion-panel>
+               </ng-container>
+          </div>
+
+     </mat-expansion-panel>
+     <mat-expansion-panel *ngIf="this.resolutions.decided.length > 0">
+          <mat-expansion-panel-header style="background-color: green;">
+               <mat-panel-title>
+                    <span style="color: black !important;">Decided Resolution</span>
+               </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="decided-resolution-block">
+               <mat-expansion-panel *ngFor="let item of resolutions.decided; let i = index;">
+                    <mat-expansion-panel-header style="background-color: rgb(90, 120, 141);">
+                         <mat-panel-title>
+                              <span style="color:white !important;">{{ item.resolution_no }} : {{ item.resolution_type }}</span>
+                         </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="decided-resolution" id="decided-resolution-{{ item.resolution_id }}">
+                         <label>{{ item.resolution_type }}</label>
+                         <label>{{ item.resolution_heading }}</label>
+                    </div>
+               </mat-expansion-panel>
+          </div>
+     </mat-expansion-panel>
+     <mat-expansion-panel *ngIf="role == 'moderator'">
+          <mat-expansion-panel-header style="background-color: #afbdda;">
+               <mat-panel-title>
+                    <span>Create Resolution</span>
+               </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="create-resolution-block create-resolution-form">
+               <form class="resolution-form" role="form" [formGroup]="resolutionForm" (submit)="createResolution()">
+                    <div class="form-group">
+                         <label>Resolution Number</label>
+                         <input type="text" class="form-control" formControlName="number" required>
+                    </div>
+                    <div class="form-group">
+                         <label>Resolution Heading</label>
+                         <input type="text" class="form-control" formControlName="heading" required>
+                    </div>
+                    <div class="form-group">
+                         <label>Resolution Types</label>
+                         <select formControlName="types" class="form-control">
+                              <option *ngFor="let item of resolutionTypes" [value]="item.value">{{ item.name }}</option>
+                         </select>
+                    </div>
+                    <div class="form-group">
+                         <label>Resolution Category</label>
+                         <select formControlName="category" class="form-control">
+                              <option *ngFor="let item of resolutionCategory" [value]="item.value">{{ item.name }}</option>
+                         </select>
+                    </div>
+                    <div class="form-group">
+                         <label>Proxy Allowed To Vote</label>
+                         <select formControlName="proxyAllowed" class="form-control">
+                              <option value="null">Select Proxy Allowed</option>
+                              <option value="1">Yes</option>
+                              <option value="0">No</option>
+                         </select>
+                    </div>
+                    <div class="form-group">
+                         <label>Decision Type</label>
+                         <select formControlName="decisionType" class="form-control">
+                              <option *ngFor="let item of decisionType" [value]="item.value">{{ item.name }}</option>
+                         </select>
+                    </div>
+                    <div class="form-group">
+                         <label>Choice Type</label>
+                         <select formControlName="choiceType" class="form-control" (change)="onChangeChoiceType($event)">
+                              <option *ngFor="let item of choiceType" [value]="item.value">{{ item.name }}</option>
+                         </select>
+                    </div>
+                    <ng-container *ngIf="selectedChoiceType == 'For/Against/Abstain'">
+                         <div class="form-group">
+                              <label>Decision Threshold</label>
+                              <select formControlName="decisionThreshold" class="form-control">
+                                   <option *ngFor="let item of decisionThreshold" [value]="item.value">{{ item.name }}</option>
+                              </select>
+                         </div>
+                    </ng-container>
+                    <ng-container *ngIf="selectedChoiceType == 'Value Options'">
+                         <div class="form-group">
+                              <label>Choice First</label>
+                              <input type="text" class="form-control" formControlName="choiceFirst">
+                         </div>
+                         <div class="form-group">
+                              <label>Choice Second</label>
+                              <input type="text" class="form-control" formControlName="choiceSecond">
+                         </div>
+                    </ng-container>
+                    <ng-container>
+                         <div class="form-group">
+                              <label>Resolution Description</label>
+                              <textarea type="text" class="form-control" formControlName="description" required></textarea>
+                         </div>
+                    </ng-container>
+                    <ng-container>
+
+                    </ng-container>
+                    <div class="button-block">
+                         <button type="submit" class="btn btn-primary" [disabled]="!resolutionForm.valid">Create</button>
+                    </div>
+               </form>
+          </div>
+     </mat-expansion-panel>
+</div>
